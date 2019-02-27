@@ -48,6 +48,12 @@
 #define	IO_GPIO_FALL_IE	IO_ADDR(0x014)	/* word, RW */
 #define	IO_GPIO_INPUT	IO_ADDR(0x000)	/* word, RW */
 
+#define	IO_PWM_DUTY	IO_ADDR(0x30000)	/* word , WR */
+
+#define	IO_UART 	IO_ADDR(0x10000)	/* word , RW */
+#define	IO_TONE_PERIOD 	IO_ADDR(0x40000)	/* word , WR */
+#define	IO_TONE_DURATION IO_ADDR(0x40004)	/* word , WR */
+
 #define	IO_TIMER	IO_ADDR(0x100)	/* 16-byte, WR */
 
 #define	IO_SIO_BYTE	IO_ADDR(0x300)	/* byte, RW */

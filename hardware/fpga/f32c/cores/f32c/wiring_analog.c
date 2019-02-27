@@ -2,6 +2,7 @@
 
 #include "Arduino.h"
 #include "wiring_analog.h"
+#include <dev/io.h>
 
 __BEGIN_DECLS
 
@@ -56,55 +57,7 @@ void analogOutputInit( void )
 
 void analogWrite(uint32_t ulPin, uint32_t ulValue)
 {
-  int8_t pwm_channel;
-  volatile uint32_t *start, *stop;
-  
-  if(ulPin >= variant_pin_map_size)
-    return;
-    
-  pwm_channel = variant_pin_map[ulPin].pwm;
-  if(pwm_channel != OCP_NONE)
-  {
-    /* standard PWM frequency is 
-    ** 490 Hz on old arduino
-    ** 980 Hz in new arduino
-    ** for better high freq coverage and compatibility with
-    ** 12-bit analogWrite we need to recompile bitstream with 
-    ** PRESCALER_BITS=10 and with TIMER_BITS=12
-    ** to calculate increment:
-    ** increment = (frequency_hz << (TIMER_BITS+PRESCALER_BITS) ) / TIMER_CLOCK_hz;
-    */
-    EMARD_TIMER[TC_INCREMENT] = (((uint64_t)analog_write_frequency) 
-                                   << (TIMER_BITS+PRESCALER_BITS)) / TIMER_CLOCK;
-
-    EMARD_TIMER[TC_CONTROL] &= pwm_enable_bitmask[pwm_channel].control_and;
-    /* shift timer step value to match the set resolution */
-    if(analog_write_resolution_bits < TIMER_BITS)
-      ulValue <<= (TIMER_BITS-analog_write_resolution_bits);
-    if(analog_write_resolution_bits > TIMER_BITS)
-      ulValue >>= (analog_write_resolution_bits-analog_write_resolution_bits);
-      
-    start = &EMARD_TIMER[pwm_enable_bitmask[pwm_channel].ocp_start];
-    stop  = &EMARD_TIMER[pwm_enable_bitmask[pwm_channel].ocp_stop];
-    
-    *stop  = /* ((1<<TIMER_BITS)-1) & */
-             ( *start
-             + ( ulValue < (1<<TIMER_BITS) ? ulValue : (1<<TIMER_BITS) )
-             );
-
-    if( *start <= *stop )
-      EMARD_TIMER[TC_CONTROL] |= pwm_enable_bitmask[pwm_channel].control_and_or;
-    
-    #if 0
-    /* input caputre setting
-    ** this code doesn't belong here
-    ** initializing ICP engine to capture all events
-    */
-    #endif
-
-    EMARD_TIMER[TC_CONTROL] |= pwm_enable_bitmask[pwm_channel].control_or;
-    EMARD_TIMER[TC_APPLY] = pwm_enable_bitmask[pwm_channel].apply;
-  }
+    (*(volatile uint32_t *) IO_PWM_DUTY) = ulValue;
 }
 
 uint32_t analogRead(uint32_t ulPin)
