@@ -36,17 +36,17 @@
 #endif
 
 
-#define	IO_BASE		0xfffff800
+#define	IO_BASE		0xf0000000
 
 #define	IO_ADDR(a)	(IO_BASE | (a))
 
-#define	IO_GPIO_DATA	IO_ADDR(0x000)	/* word, RW */
-#define	IO_GPIO_CTL	IO_ADDR(0x004)	/* word, WR */
+#define	IO_GPIO_DATA	IO_ADDR(0x004)	/* word, RW */
+#define	IO_GPIO_CTL	IO_ADDR(0x008)	/* word, WR */
 #define	IO_GPIO_RISE_IF	IO_ADDR(0x008)	/* word, RW (clear only) */
 #define	IO_GPIO_RISE_IE	IO_ADDR(0x00C)	/* word, RW */
 #define	IO_GPIO_FALL_IF	IO_ADDR(0x010)	/* word, RW (clear only) */
 #define	IO_GPIO_FALL_IE	IO_ADDR(0x014)	/* word, RW */
-#define	IO_GPIO_INPUT	IO_ADDR(0x018)	/* word, RW (write toggles DATA) */
+#define	IO_GPIO_INPUT	IO_ADDR(0x000)	/* word, RW */
 
 #define	IO_TIMER	IO_ADDR(0x100)	/* 16-byte, WR */
 

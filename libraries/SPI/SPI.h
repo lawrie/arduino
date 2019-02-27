@@ -15,28 +15,20 @@
 #define SPI_LSBFIRST 0
 #define SPI_MSBFIRST 1
 
-// modes not yet implemented in f32c hardware
 #define SPI_MODE0 0x00
-#define SPI_MODE1 0x04
-#define SPI_MODE2 0x08
-#define SPI_MODE3 0x0C
+#define SPI_MODE1 0x02
+#define SPI_MODE2 0x01
+#define SPI_MODE3 0x03
 
-// instantiating selected SPI bus, usage:
-// SPIClass SPI_flash(SPI_FLASH);
-// SPI_flash.begin();
-// SPI_flash.begin(11); -- 11 is slave select pin, but used only for SPI_EXT
-#define SPI_FLASH 0
-#define SPI_SD 1
-#define SPI_OLED 2
-#define SPI_EXT 3
-// default SPI bus when instantiating like this:
-// SPIClass SPI;
-#define SPI_DEFAULT SPI_EXT
+#define SPI_DEFAULT 0
+#define SPI_EXT 1
+
+#define SPI_RX_VALID (1 << 31)
 
 class SPISettings
 {
 public:
-    SPISettings() :_clock(5000000), _bitOrder(SPI_MSBFIRST), _dataMode(SPI_MODE0) {}
+    SPISettings() :_clock(400000), _bitOrder(SPI_MSBFIRST), _dataMode(SPI_MODE0) {}
     SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode) :_clock(clock), _bitOrder(bitOrder), _dataMode(dataMode) {}
     uint32_t _clock;
     uint8_t  _bitOrder;
@@ -47,9 +39,10 @@ class SPIClass
 {
 private:
     int8_t _spi_num;
-    volatile uint16_t * _spi;
+    volatile uint32_t * _spi;
     int8_t _ss;
-    uint8_t _freq;
+    uint8_t _divider;
+
     void set_pin(uint8_t pin);
     void unset_pin(uint8_t pin);
 
@@ -58,7 +51,7 @@ public:
     void begin(int8_t ss=-1);
     void end();
 
-    void setClock(uint32_t clock);
+    void setClockDivider(uint32_t divider);
     void setBitOrder(uint8_t bitOrder);
     void setDataMode(uint8_t dataMode);
 

@@ -1,50 +1,49 @@
 #include <SPI.h>
 #include <Arduino.h>
 
+SPIClass SPI;
+
 SPIClass::SPIClass(uint8_t spi_bus)
     :_spi_num(spi_bus)
     ,_spi(NULL)
     ,_ss(-1)
-    ,_freq(1) // default is minimum SPI speed, about 400 kHz
+    ,_divider(62) // default is minimum SPI speed, about 400 kHz
 {}
 
 void SPIClass::begin(int8_t ss)
 {
     _ss = ss;
-    _spi = (volatile uint16_t *)(0xFFFFFB40 + (_spi_num * 0x10));
-    ((volatile uint8_t *)_spi)[1] = _freq;
+    _spi = (volatile uint32_t *)(0xF0060000 + (_spi_num * 0x100));
+    _spi[3] = _divider;
+    _spi[4] = 500; // setup
+    _spi[5] = 500; // hold
+    _spi[6] = 500; //disable
 }
 
 void SPIClass::end() {
 }
 
-void SPIClass::setClock(uint32_t clock)
+void SPIClass::setClockDivider(uint32_t divider)
 {
-    _freq = (uint8_t)(clock/(F_CPU/256));
-    ((volatile uint8_t *)_spi)[1] = _freq;
-    SPI_NOP;
+    _divider = divider;
+    _spi[3] = _divider;
 }
 
 void SPIClass::setBitOrder(uint8_t bitOrder) {
 }
 
 void SPIClass::setDataMode(uint8_t dataMode) {
+    _spi[2] = dataMode;
 }
 
-uint8_t SPIClass::transfer(uint8_t _data)
+uint8_t SPIClass::transfer(uint8_t data)
 {
-    uint32_t in;
-    ((volatile uint8_t *)_spi)[0] = _data;
-    do {
-        in = *_spi;
-        SPI_NOP;
-    } while ((in & SPI_READY_MASK) == 0);
+    _spi[0] = (data | 0x01000000); // Send and push reply
 
-    #if (_BYTE_ORDER == _LITTLE_ENDIAN)
-        return (in & 0xff);
-    #else
-        return (in >> 24);
-    #endif
+    while(1) {
+      uint32_t r = ((volatile uint32_t *)_spi)[0];
+      if (!(r & SPI_RX_VALID)) return r & 0xff;
+    }
 }
 
 void SPIClass::set_pin(uint8_t pin)
@@ -62,17 +61,15 @@ void SPIClass::unset_pin(uint8_t pin)
 }
 
 void SPIClass::beginTransaction(SPISettings settings) {
-    setClock(settings._clock);
+    setClockDivider((F_CPU / settings._clock) / 2);
     beginTransaction();
 }
 
 void SPIClass::beginTransaction() {
-    ((volatile uint8_t *)_spi)[1] = 0x80;
-    while ((*_spi & SPI_READY_MASK) == 0);
-    ((volatile uint8_t *)_spi)[1] = _freq;
-    unset_pin(_ss);
+    _spi[0] = 0x11000000;
 }
 
 void SPIClass::endTransaction() {
-    set_pin(_ss);
+    _spi[0] = 0x10000000;
 }
+ 
