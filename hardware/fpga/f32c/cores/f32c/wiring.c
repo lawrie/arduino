@@ -55,7 +55,7 @@ update_tsc(void)
 {
 	uint32_t tsc;
 
-	RDTSC(tsc);
+	tsc = (*(volatile uint32_t *)IO_MACHINE_TIMER);
 
 	/* check for 32-bit overflow */
 	if (tsc < tsc_lo)
@@ -74,7 +74,7 @@ millis(void)
 	tsc64 <<= 32;
 	tsc64 += tsc_lo;
 	
-	return((tsc64 * 1000) / F_CPU);
+	return(tsc64 / 1000);
 }
 
 
@@ -88,7 +88,7 @@ micros(void)
 	tsc64 <<= 32;
 	tsc64 += tsc_lo;
 	
-	return((tsc64 * 1000000) / F_CPU);
+	return(tsc64);
 }
 
 
@@ -96,12 +96,12 @@ void
 delay(uint32_t ms)
 {
 	int32_t t, target;
-	RDTSC(target);
+	target = (*(volatile uint32_t *)IO_MACHINE_TIMER);
 	while (ms--)
 	{
-		target += F_CPU/1000;
+		target += 1000;
 		do
-			RDTSC(t);
+			t = (*(volatile uint32_t *)IO_MACHINE_TIMER);
 		while((target-t) > 0);
 	}
 }

@@ -50,9 +50,19 @@
 
 #define	IO_PWM_DUTY	IO_ADDR(0x30000)	/* word , WR */
 
+#define	IO_PULSE_VALUE	IO_ADDR(0x80000)	/* word , RD */
+#define	IO_PULSE_TIMEOUT IO_ADDR(0x80004)	/* word , WR */
+#define	IO_PULSE_LENGTH IO_ADDR(0x80008)	/* word , WR */
+
 #define	IO_UART 	IO_ADDR(0x10000)	/* word , RW */
 #define	IO_TONE_PERIOD 	IO_ADDR(0x40000)	/* word , WR */
 #define	IO_TONE_DURATION IO_ADDR(0x40004)	/* word , WR */
+
+#define	IO_SHIFT_OUT_BYTE_VALUE IO_ADDR(0x50000) /* word , WR */
+#define	IO_SHIFT_OUT_BIT_ORDER IO_ADDR(0x50004)	 /* word , WR */
+#define	IO_SHIFT_OUT_PRE_SCALE IO_ADDR(0x50008)	 /* word , WR */
+
+#define	IO_MACHINE_TIMER IO_ADDR(0xB0000)	 /* word, RD */
 
 #define	IO_TIMER	IO_ADDR(0x100)	/* 16-byte, WR */
 
