@@ -5,9 +5,9 @@
 #include <stdint.h>
 
 /* LEDs */
-#define PIN_LED_13           13
-#define PIN_LED              13
-#define LED_BUILTIN          13
+#define PIN_LED_13           0
+#define PIN_LED              0
+#define LED_BUILTIN          0
 
 #include "Arduino.h"
 #ifdef __cplusplus
