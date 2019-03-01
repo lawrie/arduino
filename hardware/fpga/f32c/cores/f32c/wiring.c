@@ -105,3 +105,12 @@ delay(uint32_t ms)
 		while((target-t) > 0);
 	}
 }
+
+void 
+delayMicroseconds(uint32_t usec){
+    if (usec == 0) return;
+
+    int32_t endwait = micros() + usec;
+    while( ((int32_t)micros())-endwait < 0);
+}
+

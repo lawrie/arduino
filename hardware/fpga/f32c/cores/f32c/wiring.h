@@ -90,22 +90,7 @@ extern void delay( uint32_t dwMs ) ;
  *
  * \param dwUs the number of microseconds to pause (uint32_t)
  */
-static inline void delayMicroseconds(uint32_t) __attribute__((always_inline, unused));
-static inline void delayMicroseconds(uint32_t usec){
-    if (usec == 0) return;
-#if 0
-    // XXX MARKO FIXME!
-    uint32_t n = usec * (F_CPU / 3000000);
-    asm volatile(
-        "L_%=_delayMicroseconds:"       "\n\t"
-        "subs   %0, #1"                 "\n\t"
-        "bne    L_%=_delayMicroseconds" "\n"
-        : "+r" (n) :
-    );
-#endif
-    int32_t endwait = micros() + usec;
-    while( ((int32_t)micros())-endwait < 0);
-}
+extern void delayMicroseconds(uint32_t usec);
 
 __END_DECLS
 

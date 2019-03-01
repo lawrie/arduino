@@ -79,16 +79,8 @@ UARTClass::sio_getchar(int blocking)
 int
 UARTClass::sio_putchar(int c, int blocking)
 {
-  int in, busy;
-
-  do {
-    in = sio_probe_rx();
-    busy = (in & SIO_TX_BUSY) || (tx_xoff & 1);
-  } while (blocking && busy);
-
-  if (busy == 0)
-    serbase[IO_SIO_BYTE-IO_SIO_BYTE] = c;
-  return (busy);
+  (*(volatile uint32_t *)IO_UART) = c;
+  return 0;
 }
 
 

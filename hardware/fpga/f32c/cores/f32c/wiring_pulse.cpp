@@ -27,28 +27,14 @@
 extern uint32_t
 pulseIn(uint32_t pin, bool state, uint32_t timeout)
 {
-	uint32_t numloops = 0;
-	uint32_t maxloops = microsecondsToClockCycles(timeout) / 16;
-	uint32_t start, end;
-	
-	// wait for any previous pulse to end
-	while (digitalRead(pin) == state)
-		if (numloops++ == maxloops)
-			return 0;
-	
-	// wait for the pulse to start
-	while (digitalRead(pin) != state)
-		if (numloops++ == maxloops)
-			return 0;
-	
-	// wait for the pulse to stop
-	start = micros();
-	while (digitalRead(pin) == state)
-		if (numloops++ == maxloops)
-			return 0;
-	end  = micros();
 
-	return (end - start);
+  (*(volatile uint32_t *)IO_PULSE_TIMEOUT) = timeout;
+  (*(volatile uint32_t *)IO_PULSE_VALUE) = state;
+  int pulse; 
+  while(1) {
+    pulse = (*(volatile uint32_t *)IO_PULSE_LENGTH);
+    if (pulse != 0) return pulse;
+  }
 }
 
 /* use advanced timer input capture digital logic 
