@@ -1296,7 +1296,7 @@ fpga_generic.menu.cpu.riscv.compiler.ld.flags={f32c.riscv.compiler.ld.flags}
 fpga_generic.menu.ramsize.8=8 KB BRAM Internal
 fpga_generic.menu.ramsize.8.upload.maximum_size=6656
 fpga_generic.menu.ramsize.8.build.sdata.size=32768
-fpga_generic.menu.ramsize.8.compiler.ld.extra_flags=--section-start=.init=0x400
+fpga_generic.menu.ramsize.8.compiler.ld.extra_flags=--section-start=.init=0x80000C00
 fpga_generic.menu.ramsize.16=16 KB BRAM Internal
 fpga_generic.menu.ramsize.16.upload.maximum_size=14848
 fpga_generic.menu.ramsize.16.build.sdata.size=32768
@@ -1304,7 +1304,7 @@ fpga_generic.menu.ramsize.16.compiler.ld.extra_flags=--section-start=.init=0x400
 fpga_generic.menu.ramsize.32=32 KB BRAM Internal
 fpga_generic.menu.ramsize.32.upload.maximum_size=31232
 fpga_generic.menu.ramsize.32.build.sdata.size=32768
-fpga_generic.menu.ramsize.32.compiler.ld.extra_flags=--section-start=.init=0x400
+fpga_generic.menu.ramsize.32.compiler.ld.extra_flags=--section-start=.init=0x90000000
 fpga_generic.menu.ramsize.64=64 KB BRAM Internal
 fpga_generic.menu.ramsize.64.upload.maximum_size=64000
 fpga_generic.menu.ramsize.64.build.sdata.size=32768
