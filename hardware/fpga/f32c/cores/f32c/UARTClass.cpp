@@ -35,21 +35,9 @@ UARTClass::sio_probe_rx()
 {
   int c, s;
 
-  s = serbase[IO_SIO_STATUS-IO_SIO_BYTE];
-  if (s & SIO_RX_FULL) {
-    c = serbase[IO_SIO_BYTE-IO_SIO_BYTE];
-    if ((tx_xoff & 0x80)) {
-      if (c == 0x13) {
-        /* XOFF */
-        tx_xoff = 0x81;
-        return(s);
-      }
-      if (c == 0x11) {
-        /* XON */
-        tx_xoff = 0x80;
-        return(s);
-      }
-    }
+  s = serbase[1];
+  if (s >> 24) {
+    c = serbase[0]  & 0xff;
     sio_rxbuf[sio_rxbuf_head++] = c;
     sio_rxbuf_head &= SIO_RXBUFMASK;
   }
@@ -79,7 +67,7 @@ UARTClass::sio_getchar(int blocking)
 int
 UARTClass::sio_putchar(int c, int blocking)
 {
-  (*(volatile uint32_t *)IO_UART) = c;
+  serbase[0] = c;
   return 0;
 }
 

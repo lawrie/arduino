@@ -25,7 +25,7 @@
 class UARTClass : public HardwareSerial
 {
   public:
-    UARTClass(uint32_t base = IO_SIO_BYTE) : serbase(reinterpret_cast<uint8_t*>(base)), tx_xoff(0) {}
+    UARTClass(uint32_t base = IO_SIO_BYTE) : serbase(reinterpret_cast<uint32_t*>(base)), tx_xoff(0) {}
   
     void begin(unsigned long dwBaudRate);
     void end(void);
@@ -53,7 +53,7 @@ class UARTClass : public HardwareSerial
       SIO_RXBUFMASK = (SIO_RXBUFSIZE - 1)
     };
 
-    volatile uint8_t *serbase;  // base address of SIO register for port
+    volatile uint32_t *serbase;  // base address of SIO register for port
     volatile uint8_t  tx_xoff;  // bit 7 set enables Xon/Xoff flow control (default disabled)
     volatile uint8_t  sio_rxbuf_head;
     volatile uint8_t  sio_rxbuf_tail;
