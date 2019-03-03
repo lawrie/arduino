@@ -25,31 +25,14 @@
 #include "wiring_private.h"
 
 uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
-	uint32_t value = 0;
-	uint8_t i;
-
-	for (i = 0; i < 8; ++i) {
-		digitalWrite(clockPin, HIGH);
-		if (bitOrder == LSBFIRST)
-			value |= digitalRead(dataPin) << i;
-		else
-			value |= digitalRead(dataPin) << (7 - i);
-		digitalWrite(clockPin, LOW);
-	}
-	return value;
+	(*(volatile uint32_t*) IO_SHIFT_IN_PRE_SCALE) = 1000;
+	(*(volatile uint32_t*) IO_SHIFT_IN_BIT_ORDER) = bitOrder;
+	return (*(volatile uint32_t*) IO_SHIFT_IN_BYTE_VALUE);
 }
 
 void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val)
 {
-	uint8_t i;
-
-	for (i = 0; i < 8; i++)  {
-		if (bitOrder == LSBFIRST)
-			digitalWrite(dataPin, !!(val & (1 << i)));
-		else	
-			digitalWrite(dataPin, !!(val & (1 << (7 - i))));
-			
-		digitalWrite(clockPin, HIGH);
-		digitalWrite(clockPin, LOW);		
-	}
+	(*(volatile uint32_t*) IO_SHIFT_OUT_PRE_SCALE) = 1000;
+	(*(volatile uint32_t*) IO_SHIFT_OUT_BIT_ORDER) = bitOrder;
+	(*(volatile uint32_t*) IO_SHIFT_OUT_BYTE_VALUE) = val;
 }

@@ -28,9 +28,6 @@
 #ifndef _IO_H_
 #define	_IO_H_
 
-#ifdef __mips__
-#include <mips/io.h>
-#endif
 #ifdef __riscv
 #include <riscv/io.h>
 #endif
@@ -62,6 +59,10 @@
 #define	IO_SHIFT_OUT_BIT_ORDER IO_ADDR(0x50004)	 /* word , WR */
 #define	IO_SHIFT_OUT_PRE_SCALE IO_ADDR(0x50008)	 /* word , WR */
 
+#define	IO_SHIFT_IN_BIT_ORDER IO_ADDR(0xA0008)	 /* word , WR */
+#define	IO_SHIFT_IN_PRE_SCALE IO_ADDR(0xA0004)	 /* word , WR */
+#define	IO_SHIFT_IN_BYTE_VALUE IO_ADDR(0xA0000)	 /* word , WR */
+
 #define	IO_MACHINE_TIMER IO_ADDR(0xB0000)	 /* word, RD */
 
 #define	IO_TIMER	IO_ADDR(0x100)	/* 16-byte, WR */
@@ -69,25 +70,6 @@
 #define	IO_SIO_BYTE	IO_ADDR(0x10000)	/* word, RW */
 #define	IO_SIO_STATUS	IO_ADDR(0x10004)	/* word, RD */
 #define	IO_SIO_BAUD	IO_ADDR(0x10008)	/* word, WR */
-
-#define	IO_SPI_FLASH	IO_ADDR(0x340)	/* half, RW */
-#define	IO_SPI_SDCARD	IO_ADDR(0x350)	/* half, RW */
-
-#define	IO_FB		IO_ADDR(0x380)	/* word, WR */
-
-#define	IO_PCM_CUR	IO_ADDR(0x3A0)	/* word, RD */
-#define	IO_PCM_FIRST	IO_ADDR(0x3A0)	/* word, WR */
-#define	IO_PCM_LAST	IO_ADDR(0x3A4)	/* word, WR */
-#define	IO_PCM_FREQ	IO_ADDR(0x3A8)	/* word, WR */
-#define	IO_PCM_VOLUME	IO_ADDR(0x3AC)	/* half, WR */
-
-#define	IO_LEGO_DATA	IO_ADDR(0x520)	/* byte, WR */
-#define	IO_LEGO_CTL	IO_ADDR(0x521)	/* byte, WR */
-
-#define	IO_PUSHBTN	IO_ADDR(0x700)	/* word, RD */
-#define	IO_DIPSW	IO_ADDR(0x702)	/* word, RD */
-#define	IO_LED		IO_ADDR(0x710)	/* word, WR */
-#define	IO_LCD		IO_ADDR(0x712)	/* word, WR */
 
 #define	IO_CPU_RESET	IO_ADDR(0x7F0)	/* byte, WR */
 
