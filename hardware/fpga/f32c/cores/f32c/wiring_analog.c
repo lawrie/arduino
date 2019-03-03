@@ -60,6 +60,10 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue)
     (*(volatile uint32_t *) IO_PWM_DUTY) = ulValue;
 }
 
+void analogReference( eAnalogReference ulMode ) 
+{
+}
+
 uint32_t analogRead(uint32_t ulPin)
 {
   /* TODO
