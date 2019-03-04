@@ -27,7 +27,37 @@
 
 #define BUFFER_LENGTH 32
 
-extern "C" void i2c0_isr(void);
+#define I2C_TX_DATA (*(volatile uint32_t*)0xF0070000)
+#define I2C_TX_ACK (*(volatile uint32_t*)0xF0070004)
+#define I2C_RX_DATA (*(volatile uint32_t*)0xF0070008)
+#define I2C_RX_ACK (*(volatile uint32_t*)0xF007000C)
+#define I2C_INTERRUPT (*(volatile uint32_t*)0xF0070020)
+#define I2C_SAMPLING_CLOCK_DIVIDER (*(volatile uint32_t*)0xF0070028)
+#define I2C_TIMEOUT (*(volatile uint32_t*)0xF007002C)
+#define I2C_TSU_DAT (*(volatile uint32_t*)0xF0070030)
+#define I2C_MASTER_STATUS (*(volatile uint32_t*)0xF0070040)
+#define I2C_TLOW (*(volatile uint32_t*)0xF0070050)
+#define I2C_THIGH (*(volatile uint32_t*)0xF0070054)
+#define I2C_TBUF (*(volatile uint32_t*)0xF0070058)
+#define I2C_FILTER_STATUS (*(volatile uint32_t*)0xF0070080)
+#define I2C_HIT_CONTEXT (*(volatile uint32_t*)0xF0070084)
+#define I2C_FILTERING_CONFIG (*(volatile uint32_t*)0xF0070088)
+
+
+#define I2C_MASTER_IS_BUSY (1 << 0)
+#define I2C_MASTER_START (1 << 4)
+#define I2C_MASTER_STOP (1 << 5)
+
+#define I2C_TX_ENABLE (1 << 9)
+#define I2C_TX_VALID (1 << 8)
+
+#define I2C_RX_ENABLE (1 << 9)
+#define I2C_RX_VALID (1 << 8)
+#define I2C_RX_LISTEN (1 << 9)
+
+#define I2C_MAX_READ 10
+
+#define MAX_TRIES 1000
 
 class TwoWire : public Stream
 {
@@ -47,7 +77,6 @@ class TwoWire : public Stream
     static void (*user_onRequest)(void);
     static void (*user_onReceive)(int);
     static void sda_rising_isr(void);
-    friend void i2c0_isr(void);
   public:
     TwoWire();
     void begin();
@@ -71,19 +100,6 @@ class TwoWire : public Stream
     void onReceive( void (*)(int) );
     void onRequest( void (*)(void) );
   
-#ifdef CORE_TEENSY
-    // added by Teensyduino installer, for compatibility
-    // with pre-1.0 sketches and libraries
-    void send(uint8_t b)               { write(b); }
-    void send(uint8_t *s, uint8_t n)   { write(s, n); }
-    void send(int n)                   { write((uint8_t)n); }
-    void send(char *s)                 { write(s); }
-    uint8_t receive(void) {
-        int c = read();
-        if (c < 0) return 0;
-        return c;
-    }
-#endif
     inline size_t write(unsigned long n) { return write((uint8_t)n); }
     inline size_t write(long n) { return write((uint8_t)n); }
     inline size_t write(unsigned int n) { return write((uint8_t)n); }
@@ -92,84 +108,5 @@ class TwoWire : public Stream
 };
 
 extern TwoWire Wire;
-
-#if defined(__MK20DX128__) || defined(__MK20DX256__)
-class TWBRemulation
-{
-public:
-	inline TWBRemulation & operator = (int val) __attribute__((always_inline)) {
-		if (val == 12 || val == ((F_CPU / 400000) - 16) / 2) { // 22, 52, 112
-			I2C0_C1 = 0;
-			#if F_BUS == 60000000
-			I2C0_F = 0x1C; // 416 kHz
-			#elif F_BUS == 56000000
-			I2C0_F = 0x1C; // 389 kHz
-			#elif F_BUS == 48000000
-			I2C0_F = 0x1A; // 400 kHz
-			#elif F_BUS == 40000000
-			I2C0_F = 0x19; // 416 kHz
-			#elif F_BUS == 36000000
-			I2C0_F = 0x19; // 375 kHz
-			#elif F_BUS == 24000000
-			I2C0_F = 0x12; // 375 kHz
-			#elif F_BUS == 16000000
-			I2C0_F = 0x07; // 400 kHz
-			#elif F_BUS == 8000000
-			I2C0_F = 0x00; // 400 kHz
-			#elif F_BUS == 4000000
-			I2C0_F = 0x00; // 200 kHz
-			#endif
-			I2C0_C1 = I2C_C1_IICEN;
-		} else if (val == 72 || val == ((F_CPU / 100000) - 16) / 2) { // 112, 232, 472
-			I2C0_C1 = 0;
-			#if F_BUS == 60000000
-			I2C0_F = 0x2C; // 104 kHz
-			#elif F_BUS == 56000000
-			I2C0_F = 0x2B; // 109 kHz
-			#elif F_BUS == 48000000
-			I2C0_F = 0x27; // 100 kHz
-			#elif F_BUS == 40000000
-			I2C0_F = 0x29; // 104 kHz
-			#elif F_BUS == 36000000
-			I2C0_F = 0x28; // 113 kHz
-			#elif F_BUS == 24000000
-			I2C0_F = 0x1F; // 100 kHz
-			#elif F_BUS == 16000000
-			I2C0_F = 0x20; // 100 kHz
-			#elif F_BUS == 8000000
-			I2C0_F = 0x14; // 100 kHz
-			#elif F_BUS == 4000000
-			I2C0_F = 0x07; // 100 kHz
-			#elif F_BUS == 2000000
-			I2C0_F = 0x00; // 100 kHz
-			#endif
-			I2C0_C1 = I2C_C1_IICEN;
-		}
-		return *this;
-	}
-	inline operator int () const __attribute__((always_inline)) {
-		#if F_BUS == 60000000
-		if (I2C0_F == 0x1C) return 12;
-		#elif F_BUS == 48000000
-		if (I2C0_F == 0x1A) return 12;
-		#elif F_BUS == 40000000
-		if (I2C0_F == 0x19) return 12;
-		#elif F_BUS == 36000000
-		if (I2C0_F == 0x19) return 12;
-		#elif F_BUS == 24000000
-		if (I2C0_F == 0x12) return 12;
-		#elif F_BUS == 16000000
-		if (I2C0_F == 0x07) return 12;
-		#elif F_BUS == 8000000
-		if (I2C0_F == 0x00) return 12;
-		#elif F_BUS == 4000000
-		if (I2C0_F == 0x00) return 12;
-		#endif
-		return 72;
-	}
-};
-extern TWBRemulation TWBR;
-#endif
-
 #endif
 
