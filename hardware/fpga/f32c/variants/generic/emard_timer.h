@@ -1,6 +1,6 @@
 
-#ifndef _f32c_mips_emard_timer_h
-#define _f32c_mips_emard_timer_h
+#ifndef _f32c_emard_timer_h
+#define _f32c_emard_timer_h
 
 #include <stdint.h>
 
@@ -230,4 +230,4 @@ extern volatile uint32_t *EMARD_TIMER;
 */
 #define VARIANT_OCPN 2
 
-#endif /* _f32c_mips_emard_timer_h */
+#endif /* _f32c_emard_timer_h */

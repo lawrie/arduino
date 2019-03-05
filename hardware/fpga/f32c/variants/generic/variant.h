@@ -1,6 +1,6 @@
 
-#ifndef _f32c_mips_variant_h
-#define _f32c_mips_variant_h
+#ifndef _f32c_variant_h
+#define _f32c_variant_h
 
 #include <stdint.h>
 
@@ -32,5 +32,5 @@ static const uint8_t A1  = 17;
 static const uint8_t PWM0  = 14;
 static const uint8_t PWM1  = 15;
 
-#endif /* _f32c_mips_variant_h */
+#endif /* _f32c_variant_h */
 
